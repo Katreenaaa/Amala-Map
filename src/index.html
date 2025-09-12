@@ -15,11 +15,41 @@
               "nigerian-orange": "#FF6B35",
               "nigerian-yellow": "#F7931E",
               "nigerian-green": "#2E8B57",
-              "nigerian-brown": "#8B4513",
-              "nigerian-red": "#DC143C",
               "verified-green": "#10B981",
               "pending-gray": "#6B7280",
-              "revoked-red": "#DC143C",
+              "warm-purple": "#8B5CF6",
+              "light-purple": "#F3F0FF",
+            },
+            animation: {
+              "pulse-custom": "pulse 2s infinite",
+              "chat-pulse": "chatPulse 3s infinite",
+              "typing-pulse": "typingPulse 1.5s infinite",
+              "recording-pulse": "recordingPulse 1s infinite",
+              pulsate: "pulsate 2s infinite",
+            },
+            keyframes: {
+              chatPulse: {
+                "0%, 100%": {
+                  boxShadow: "0 8px 32px rgba(16, 185, 129, 0.4)",
+                },
+                "50%": {
+                  boxShadow:
+                    "0 8px 32px rgba(16, 185, 129, 0.6), 0 0 0 8px rgba(16, 185, 129, 0.1)",
+                },
+              },
+              typingPulse: {
+                "0%, 100%": { opacity: "0.7" },
+                "50%": { opacity: "1" },
+              },
+              recordingPulse: {
+                "0%, 100%": { transform: "scale(1)" },
+                "50%": { transform: "scale(1.1)" },
+              },
+              pulsate: {
+                "0%": { boxShadow: "0 10px 25px rgba(255, 107, 53, 0.25)" },
+                "50%": { boxShadow: "0 10px 35px rgba(255, 107, 53, 0.5)" },
+                "100%": { boxShadow: "0 10px 25px rgba(255, 107, 53, 0.25)" },
+              },
             },
           },
         },
@@ -1122,12 +1152,517 @@
     </main>
 
     <!-- Floating Add Button -->
-    <a
-      href="#add-spot"
-      class="fixed bottom-5 right-5 w-14 h-14 bg-nigerian-orange text-white rounded-full shadow-xl hover:bg-orange-600 hover:scale-110 transition-all z-50 flex items-center justify-center text-2xl"
-      >➕</a
+    <button
+      type="button"
+      class="fixed bottom-5 left-5 w-14 h-14 bg-nigerian-orange text-white rounded-full shadow-2xl flex items-center justify-center text-2xl no-underline z-50 transition-all hover:bg-orange-600 hover:scale-110 animate-pulsate"
+      onclick="showSection('add-spot')"
     >
+      ➕
+    </button>
 
+    <!-- AI Chat Assistant -->
+    <button
+      class="fixed bottom-5 right-5 w-16 h-16 bg-gradient-to-br from-verified-green to-green-600 text-white rounded-full shadow-2xl flex items-center justify-center text-3xl cursor-pointer z-50 transition-all border-4 border-white animate-chat-pulse hover:from-green-600 hover:to-verified-green hover:scale-110"
+      onclick="toggleChat()"
+    >
+      🤖
+    </button>
+
+    <div
+      id="chatWindow"
+      class="fixed top-28 right-24 bottom-24 w-96 max-w-[calc(100vw-2.5rem)] h-[520px] bg-white rounded-2xl shadow-2xl z-60 hidden flex-col overflow-hidden opacity-0 translate-y-5 scale-95 transition-all duration-300"
+    >
+      <div
+        class="bg-gradient-to-br from-verified-green to-green-600 text-white px-5 py-5 flex items-center justify-between relative"
+      >
+        <div
+          class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
+        ></div>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl border-2 border-white/30"
+          >
+            🍲
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold m-0">Amala Assistant</h3>
+            <div class="text-xs opacity-90 mt-0.5 chat-status">
+              Online • Ready to help
+            </div>
+          </div>
+        </div>
+        <button
+          class="bg-none border-none text-white text-xl cursor-pointer p-0 w-6 h-6 flex items-center justify-center"
+          onclick="toggleChat()"
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+        class="flex-1 p-4 overflow-y-auto flex flex-col gap-4"
+        id="chatMessages"
+      >
+        <div
+          class="max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed relative shadow-sm mb-2 bg-gradient-to-br from-light-purple to-slate-50 text-gray-700 self-start rounded-bl-md border border-purple-100"
+        >
+          Hi! I can help you find or verify Amala spots. What would you like to
+          do?
+        </div>
+      </div>
+
+      <div class="px-5 flex flex-wrap gap-2 mb-5">
+        <button
+          class="bg-gradient-to-br from-slate-50 to-slate-100 text-slate-600 px-4 py-2 rounded-2xl text-sm font-medium cursor-pointer border border-slate-200 transition-all shadow-sm hover:bg-gradient-to-br hover:from-warm-purple hover:to-purple-600 hover:text-white hover:border-warm-purple hover:-translate-y-px hover:shadow-lg active:translate-y-0"
+          onclick="sendQuickMessage('Find nearest spot')"
+        >
+          📍 Find nearest spot
+        </button>
+        <button
+          class="bg-gradient-to-br from-slate-50 to-slate-100 text-slate-600 px-4 py-2 rounded-2xl text-sm font-medium cursor-pointer border border-slate-200 transition-all shadow-sm hover:bg-gradient-to-br hover:from-warm-purple hover:to-purple-600 hover:text-white hover:border-warm-purple hover:-translate-y-px hover:shadow-lg active:translate-y-0"
+          onclick="sendQuickMessage('Show verified only')"
+        >
+          ✅ Show verified only
+        </button>
+        <button
+          class="bg-gradient-to-br from-slate-50 to-slate-100 text-slate-600 px-4 py-2 rounded-2xl text-sm font-medium cursor-pointer border border-slate-200 transition-all shadow-sm hover:bg-gradient-to-br hover:from-warm-purple hover:to-purple-600 hover:text-white hover:border-warm-purple hover:-translate-y-px hover:shadow-lg active:translate-y-0"
+          onclick="sendQuickMessage('Add a new spot')"
+        >
+          ➕ Add a new spot
+        </button>
+      </div>
+
+      <div
+        class="px-5 py-5 border-t border-slate-100 flex gap-3 items-center bg-slate-50"
+      >
+        <input
+          type="text"
+          class="flex-1 px-4 py-3 border-2 border-slate-200 rounded-2xl outline-none text-sm bg-white transition-all focus:border-warm-purple focus:ring-4 focus:ring-purple-100"
+          id="chatInput"
+          placeholder="Ask me anything about Amala spots..."
+          onkeypress="handleChatKeypress(event)"
+        />
+        <button
+          class="bg-gradient-to-br from-warm-purple to-purple-600 text-white border-none w-9 h-9 rounded-full flex items-center justify-center cursor-pointer text-sm transition-all shadow-sm hover:from-purple-600 hover:to-warm-purple hover:scale-105 hover:shadow-lg"
+          id="voiceBtn"
+          onclick="startVoiceInput()"
+        >
+          🎤
+        </button>
+        <button
+          class="bg-gradient-to-br from-warm-purple to-purple-600 text-white border-none w-9 h-9 rounded-full flex items-center justify-center cursor-pointer text-sm transition-all shadow-sm hover:from-purple-600 hover:to-warm-purple hover:scale-105 hover:shadow-lg"
+          onclick="sendMessage()"
+        >
+          ➤
+        </button>
+      </div>
+    </div>
+    <script>
+      // Navigation
+      function showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll(".page-section").forEach((section) => {
+          section.classList.add("hidden");
+          section.classList.remove("block");
+        });
+
+        // Show selected section
+        const targetSection = document.getElementById(sectionId);
+        targetSection.classList.remove("hidden");
+        targetSection.classList.add("block");
+
+        // Close mobile menu
+        const mobileMenu = document.getElementById("mobileMenu");
+        mobileMenu.classList.remove("opacity-100", "visible", "translate-y-0");
+        mobileMenu.classList.add("opacity-0", "invisible", "-translate-y-2");
+      }
+
+      function toggleMobileMenu() {
+        const mobileMenu = document.getElementById("mobileMenu");
+        if (mobileMenu.classList.contains("opacity-0")) {
+          mobileMenu.classList.remove(
+            "opacity-0",
+            "invisible",
+            "-translate-y-2"
+          );
+          mobileMenu.classList.add("opacity-100", "visible", "translate-y-0");
+        } else {
+          mobileMenu.classList.remove(
+            "opacity-100",
+            "visible",
+            "translate-y-0"
+          );
+          mobileMenu.classList.add("opacity-0", "invisible", "-translate-y-2");
+        }
+      }
+
+      // Chat functionality
+      let isRecording = false;
+
+      function toggleChat() {
+        const chatWindow = document.getElementById("chatWindow");
+        if (chatWindow.classList.contains("hidden")) {
+          chatWindow.classList.remove("hidden");
+          chatWindow.classList.add("flex");
+          setTimeout(() => {
+            chatWindow.classList.remove(
+              "opacity-0",
+              "translate-y-5",
+              "scale-95"
+            );
+            chatWindow.classList.add(
+              "opacity-100",
+              "translate-y-0",
+              "scale-100"
+            );
+          }, 10);
+          updateChatStatus("Online • Ready to help");
+        } else {
+          chatWindow.classList.remove(
+            "opacity-100",
+            "translate-y-0",
+            "scale-100"
+          );
+          chatWindow.classList.add("opacity-0", "translate-y-5", "scale-95");
+          setTimeout(() => {
+            chatWindow.classList.remove("flex");
+            chatWindow.classList.add("hidden");
+          }, 300);
+        }
+      }
+
+      function updateChatStatus(status) {
+        const statusElement = document.querySelector(".chat-status");
+        if (statusElement) {
+          statusElement.textContent = status;
+        }
+      }
+
+      function sendMessage() {
+        const input = document.getElementById("chatInput");
+        const message = input.value.trim();
+        if (message) {
+          addMessage(message, "user");
+          input.value = "";
+
+          // Show typing indicator
+          showTypingIndicator();
+
+          // Simulate AI response
+          setTimeout(() => {
+            hideTypingIndicator();
+            handleAIResponse(message);
+          }, 1500);
+        }
+      }
+
+      function sendQuickMessage(message) {
+        // Remove emoji prefix for processing
+        const cleanMessage = message.replace(/^[📍✅➕]\s/, "");
+        addMessage(cleanMessage, "user");
+
+        showTypingIndicator();
+        setTimeout(() => {
+          hideTypingIndicator();
+          handleAIResponse(cleanMessage);
+        }, 1500);
+      }
+
+      function showTypingIndicator() {
+        const messagesContainer = document.getElementById("chatMessages");
+        const typingDiv = document.createElement("div");
+        typingDiv.className =
+          "max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed relative shadow-sm mb-2 bg-warm-purple text-white self-start rounded-bl-md animate-typing-pulse";
+        typingDiv.id = "typingIndicator";
+        typingDiv.innerHTML = "💭 Thinking...";
+        messagesContainer.appendChild(typingDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        updateChatStatus("Typing...");
+      }
+
+      function hideTypingIndicator() {
+        const typingIndicator = document.getElementById("typingIndicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+        updateChatStatus("Online • Ready to help");
+      }
+
+      function addMessage(text, sender) {
+        const messagesContainer = document.getElementById("chatMessages");
+        const messageDiv = document.createElement("div");
+
+        if (sender === "assistant") {
+          messageDiv.className =
+            "max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed relative shadow-sm mb-2 bg-gradient-to-br from-light-purple to-slate-50 text-gray-700 self-start rounded-bl-md border border-purple-100";
+        } else {
+          messageDiv.className =
+            "max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed relative shadow-sm mb-2 bg-gradient-to-br from-green-50 to-emerald-50 text-green-800 self-end rounded-br-md border border-green-200";
+        }
+
+        messageDiv.textContent = text;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      function handleAIResponse(userMessage) {
+        let response = "";
+
+        if (
+          userMessage.toLowerCase().includes("nearest") ||
+          userMessage.toLowerCase().includes("find")
+        ) {
+          response = "I found 3 amazing Amala spots near you! 🎯";
+          addMessage(response, "assistant");
+
+          // Add multiple spot cards
+          const spots = [
+            {
+              name: "Mama Cass Amala",
+              distance: "0.5km away",
+              rating: "⭐ 4.8 (127 reviews)",
+              price: "₦800-1200",
+              verified: true,
+            },
+            {
+              name: "Iya Basira Spot",
+              distance: "1.2km away",
+              rating: "⭐ 4.2 (23 reviews)",
+              price: "₦600-900",
+              verified: false,
+            },
+            {
+              name: "Bukka Hut",
+              distance: "2.1km away",
+              rating: "⭐ 4.6 (89 reviews)",
+              price: "₦1000-1500",
+              verified: true,
+            },
+          ];
+
+          spots.forEach((spot) => {
+            addSpotCard(spot);
+          });
+        } else if (userMessage.toLowerCase().includes("verified")) {
+          response =
+            "Here are the verified Amala spots in your area ✅ All have been endorsed by 3+ community members and meet our quality standards.";
+          addMessage(response, "assistant");
+
+          const verifiedSpot = {
+            name: "Mama Cass Amala",
+            distance: "0.5km away",
+            rating: "⭐ 4.8 (127 reviews)",
+            price: "₦800-1200",
+            verified: true,
+          };
+          addSpotCard(verifiedSpot);
+        } else if (
+          userMessage.toLowerCase().includes("add") ||
+          userMessage.toLowerCase().includes("new")
+        ) {
+          response =
+            "Great! I'll help you add a new Amala spot 🍲 You can use our form to submit details and photos for community verification.";
+          addMessage(response, "assistant");
+          setTimeout(() => {
+            showSection("add-spot");
+            toggleChat();
+          }, 2000);
+        } else {
+          response =
+            "I can help you find Amala spots, check verification status, or add new locations. What would you like to do? 😊";
+          addMessage(response, "assistant");
+        }
+
+        document.getElementById("chatMessages").scrollTop =
+          document.getElementById("chatMessages").scrollHeight;
+      }
+
+      function addSpotCard(spot) {
+        const messagesContainer = document.getElementById("chatMessages");
+        const spotCard = document.createElement("div");
+        spotCard.className =
+          "bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-xl p-4 my-3 shadow-sm transition-all hover:-translate-y-px hover:shadow-lg";
+        spotCard.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-200 to-orange-300 rounded-lg flex items-center justify-center text-lg">🍲</div>
+                    <div>
+                        <h4 class="font-semibold m-0 text-sm text-gray-800">${
+                          spot.name
+                        } ${spot.verified ? "✅" : ""}</h4>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 my-1.5 leading-snug">${
+                  spot.rating
+                } • ${spot.price}</p>
+                <div class="flex items-center gap-2">
+                    <button class="bg-gradient-to-br from-verified-green to-green-600 text-white border-none px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all shadow-sm hover:from-green-600 hover:to-verified-green hover:-translate-y-px hover:shadow-md" onclick="showSection('home'); toggleChat();">View on Map</button>
+                    <span class="text-xs text-warm-purple font-medium">${
+                      spot.distance
+                    }</span>
+                </div>
+            `;
+        messagesContainer.appendChild(spotCard);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      function handleChatKeypress(event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      }
+
+      function startVoiceInput() {
+        const voiceBtn = document.getElementById("voiceBtn");
+
+        if (
+          "webkitSpeechRecognition" in window ||
+          "SpeechRecognition" in window
+        ) {
+          const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+          const recognition = new SpeechRecognition();
+
+          recognition.continuous = false;
+          recognition.interimResults = false;
+          recognition.lang = "en-US";
+
+          if (!isRecording) {
+            isRecording = true;
+            voiceBtn.classList.add(
+              "bg-gradient-to-br",
+              "from-red-500",
+              "to-red-600",
+              "animate-recording-pulse"
+            );
+            voiceBtn.classList.remove(
+              "bg-gradient-to-br",
+              "from-warm-purple",
+              "to-purple-600"
+            );
+            updateChatStatus("Listening...");
+
+            recognition.onresult = function (event) {
+              const transcript = event.results[0][0].transcript;
+              document.getElementById("chatInput").value = transcript;
+              isRecording = false;
+              voiceBtn.classList.remove(
+                "bg-gradient-to-br",
+                "from-red-500",
+                "to-red-600",
+                "animate-recording-pulse"
+              );
+              voiceBtn.classList.add(
+                "bg-gradient-to-br",
+                "from-warm-purple",
+                "to-purple-600"
+              );
+              updateChatStatus("Online • Ready to help");
+            };
+
+            recognition.onerror = function (event) {
+              isRecording = false;
+              voiceBtn.classList.remove(
+                "bg-gradient-to-br",
+                "from-red-500",
+                "to-red-600",
+                "animate-recording-pulse"
+              );
+              voiceBtn.classList.add(
+                "bg-gradient-to-br",
+                "from-warm-purple",
+                "to-purple-600"
+              );
+              updateChatStatus("Online • Ready to help");
+              addMessage(
+                "Sorry, I couldn't hear you clearly. Please try again! 🎤",
+                "assistant"
+              );
+            };
+
+            recognition.onend = function () {
+              isRecording = false;
+              voiceBtn.classList.remove(
+                "bg-gradient-to-br",
+                "from-red-500",
+                "to-red-600",
+                "animate-recording-pulse"
+              );
+              voiceBtn.classList.add(
+                "bg-gradient-to-br",
+                "from-warm-purple",
+                "to-purple-600"
+              );
+              updateChatStatus("Online • Ready to help");
+            };
+
+            recognition.start();
+          } else {
+            recognition.stop();
+            isRecording = false;
+            voiceBtn.classList.remove(
+              "bg-gradient-to-br",
+              "from-red-500",
+              "to-red-600",
+              "animate-recording-pulse"
+            );
+            voiceBtn.classList.add(
+              "bg-gradient-to-br",
+              "from-warm-purple",
+              "to-purple-600"
+            );
+            updateChatStatus("Online • Ready to help");
+          }
+        } else {
+          addMessage(
+            "Voice input not supported in this browser. Please type your message instead! 😊",
+            "assistant"
+          );
+        }
+      }
+
+      // Close mobile menu when clicking outside
+      document.addEventListener("click", function (event) {
+        const mobileMenu = document.getElementById("mobileMenu");
+        const hamburger = document.querySelector(".hamburger");
+
+        if (
+          !mobileMenu.contains(event.target) &&
+          !hamburger.contains(event.target)
+        ) {
+          mobileMenu.classList.remove(
+            "opacity-100",
+            "visible",
+            "translate-y-0"
+          );
+          mobileMenu.classList.add("opacity-0", "invisible", "-translate-y-2");
+        }
+      });
+
+      // Close chat when clicking outside
+      document.addEventListener("click", function (event) {
+        const chatWindow = document.getElementById("chatWindow");
+        const chatButton = document.querySelector(".chat-button");
+
+        if (
+          !chatWindow.contains(event.target) &&
+          !chatButton.contains(event.target)
+        ) {
+          if (!chatWindow.classList.contains("hidden")) {
+            chatWindow.classList.remove(
+              "opacity-100",
+              "translate-y-0",
+              "scale-100"
+            );
+            chatWindow.classList.add("opacity-0", "translate-y-5", "scale-95");
+            setTimeout(() => {
+              chatWindow.classList.remove("flex");
+              chatWindow.classList.add("hidden");
+            }, 300);
+          }
+        }
+      });
+    </script>
     <script>
       (function () {
         function c() {
@@ -1135,7 +1670,7 @@
           if (b) {
             var d = b.createElement("script");
             d.innerHTML =
-              "window.__CF$cv$params={r:'97c830d8a2217830',t:'MTc1NzQzNjY5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+              "window.__CF$cv$params={r:'97df50c0305b71e6',t:'MTc1NzY3OTE3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }

@@ -157,40 +157,76 @@
   </head>
   <body class="bg-gray-50 text-gray-700 font-sans leading-relaxed">
     <script>
-      // Navigation functionality
+      // Top-level navigation
       function showSection(sectionId) {
-        // Hide all sections
         document.querySelectorAll(".page-section").forEach((section) => {
           section.classList.add("hidden");
           section.classList.remove("active");
         });
 
-        // Show selected section
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
           targetSection.classList.remove("hidden");
           targetSection.classList.add("active");
         }
+
+        // ✅ Scroll page to the very top
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      // Add click handlers when page loads
-      document.addEventListener("DOMContentLoaded", function () {
-        // Handle navigation links
+      // Profile tab navigation as "full-page" sections
+      function showProfileTab(tabId) {
+        // Hide all page sections first
+        document.querySelectorAll(".page-section").forEach((section) => {
+          section.classList.add("hidden");
+          section.classList.remove("active");
+        });
+
+        // Show profile section
+        const profileSection = document.getElementById("profile");
+        profileSection.classList.remove("hidden");
+        profileSection.classList.add("active");
+
+        // Hide all profile-tab content
+        profileSection.querySelectorAll(".profile-tab").forEach((tab) => {
+          tab.classList.add("hidden");
+        });
+
+        // Show selected tab
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) targetTab.classList.remove("hidden");
+
+        // ✅ Scroll page to the top of the profile area (or the page)
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        // If you prefer to scroll exactly to the profile section:
+        // profileSection.scrollIntoView({ behavior: "smooth" });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll('a[href^="#"]').forEach((link) => {
           link.addEventListener("click", function (e) {
             e.preventDefault();
             const sectionId = this.getAttribute("href").substring(1);
-            showSection(sectionId);
+
+            // If the link is in the profile sidebar, treat as full-page
+            const isProfileSidebar = this.closest("#profile .lg\\:sticky");
+            if (isProfileSidebar) {
+              showProfileTab(sectionId);
+            } else {
+              showSection(sectionId);
+            }
 
             // Close mobile menu if open
             const mobileToggle = document.getElementById("mobile-menu-toggle");
-            if (mobileToggle) {
-              mobileToggle.checked = false;
-            }
+            if (mobileToggle) mobileToggle.checked = false;
           });
         });
+
+        // Show a default section
+        showSection("home");
       });
     </script>
+
     <!-- Header -->
     <header
       class="bg-gradient-to-r from-nigerian-orange via-nigerian-yellow to-nigerian-green text-white shadow-xl sticky top-0 z-30"
@@ -339,7 +375,7 @@
               </svg>
             </div>
             <button
-              class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-nigerian-orange text-white p-2 rounded-full hover:bg-orange-600 transition-colors pulse-custom"
+              class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-nigerian-orange text-white p-2 rounded-full hover:bg-orange-600 transition-colors animate-pulse pulse-custom"
             >
               <svg
                 class="w-5 h-5"
@@ -390,13 +426,14 @@
 
           <!-- Map Placeholder -->
           <div
-            class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6"
+            class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6"
           >
             <div
               class="h-96 md:h-[60vh] min-h-[400px] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center"
             >
               <div class="text-center">
-                <div class="text-6xl mb-4">🗺️</div>
+                <div class="text-6xl mb-4 animate-bounce">🗺️</div>
+
                 <h3 class="text-xl font-bold text-gray-700 mb-2">
                   Interactive Map Coming Soon
                 </h3>
@@ -409,7 +446,9 @@
 
           <!-- Nearby Spots -->
           <div class="space-y-4">
-            <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <h3
+              class="mt-12 text-xl font-bold text-gray-800 flex items-center gap-2"
+            >
               <span>📍</span>
               Nearby Amala Spots
             </h3>
@@ -520,9 +559,9 @@
           <!-- Hero Card -->
           <div class="bg-white rounded-2xl shadow-md mb-6 overflow-hidden">
             <div
-              class="hero-section bg-blue-600 p-6 flex justify-center text-5xl"
+              class="hero-section bg-blue-600 p-8 flex justify-center text-5xl"
             >
-              🍲
+              <span class="animate-bounce">🍲</span>
             </div>
             <div class="p-6">
               <div class="flex items-center justify-between mb-2">
@@ -779,6 +818,50 @@
             </div>
           </div>
         </div>
+
+        <!-- Verification Tips -->
+        <div class="fixed top-36 right-6 z-50">
+          <button
+            class="verification-tips-toggle bg-yellow-400 hover:bg-yellow-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:animate-bounce pulse-custom"
+            onclick="toggleVerificationTips()"
+            aria-label="Show verification tips"
+          >
+            💡
+          </button>
+
+          <div
+            id="verification-tips-popup"
+            class="hidden fixed mt-4 right-10 w-72 bg-white text-gray-800 rounded-xl shadow-xl p-6 space-y-4 border border-gray-200 transform translate-x-4 opacity-0 transition-all duration-300"
+          >
+            <h4
+              class="font-semibold text-shadow-lg mb-4 flex items-center space-x-2"
+            >
+              <span class="mr-2">💡</span> Verification Tips
+            </h4>
+            <div class="space-y-2 text-sm leading-relaxed">
+              <div class="flex">
+                <span class="w-6 mr-2">📍</span>
+                <span>Verify the address is accurate and complete</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">🍲</span>
+                <span>Verify the authenticity of the Amala served</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">🕒</span>
+                <span>Check operating hours if provided</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">⭐</span>
+                <span>Consider the overall quality and customer reviews</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">💰</span>
+                <span>Verify price ranges are reasonable</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ADD SPOT SECTION -->
@@ -877,10 +960,58 @@
             </div>
           </form>
         </div>
+
+        <!-- Add-Spot Tips -->
+        <div class="fixed top-36 right-6 z-50">
+          <button
+            class="add-spot-tips-toggle bg-green-500 hover:bg-green-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:animate-bounce pulse-custom"
+            onclick="toggleAddSpotTips()"
+            aria-label="Show add-spot tips"
+          >
+            💡
+          </button>
+
+          <div
+            id="add-spot-tips-popup"
+            class="hidden fixed mt-4 right-10 w-72 bg-white text-gray-800 rounded-xl shadow-xl p-6 space-y-4 border border-gray-200 transform translate-x-4 opacity-0 transition-all duration-300"
+          >
+            <h4
+              class="font-semibold text-shadow-lg mb-4 flex items-center space-x-2"
+            >
+              <span class="mr-2">💡</span> Tips for Great Submissions
+            </h4>
+            <div class="space-y-2 text-sm leading-relaxed">
+              <div class="flex">
+                <span class="w-6 mr-2">📍</span>
+                <span>Double-check the address is accurate</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">📸</span>
+                <span>Include clear photos of the food and location</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">📝</span>
+                <span>Write detailed descriptions</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">🕒</span>
+                <span>Include operating hours if known</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">💰</span>
+                <span>Mention approximate price ranges</span>
+              </div>
+              <div class="flex">
+                <span class="w-6 mr-2">🍲</span>
+                <span>Specify what types of Amala they serve</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- PROFILE SECTION -->
-      <section id="profile" class="py-10 px-4 page-section hidden">
+      <section id="profile" class="py-4 px-4 page-section hidden">
         <div class="max-w-7xl mx-auto px-4 py-6 pb-20">
           <div class="grid lg:grid-cols-[320px_1fr] gap-8">
             <!-- Profile Sidebar -->
@@ -1122,7 +1253,7 @@
               <!-- RECENT ACTIVITY -->
               <div
                 id="activity"
-                class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+                class="profile-tab rounded-2xl shadow-sm border border-gray-200 p-6"
               >
                 <h3 class="text-xl font-bold text-gray-800 mb-4">
                   Recent Activity
@@ -1190,224 +1321,231 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MY ADDED SPOTS TAB -->
-        <div
-          id="profile-spots"
-          class="profile-tab hidden bg-white rounded-2xl p-8 shadow border border-gray-200"
-        >
-          <h2
-            class="text-2xl font-bold mb-8 flex items-center gap-2 text-gray-800"
-          >
-            📍 My Added Spots
-          </h2>
-
-          <div class="grid md:grid-cols-2 gap-6">
-            <!-- Spot Card -->
-            <div
-              class="border rounded-lg p-6 hover:shadow-lg transition-shadow"
-            >
-              <div class="flex justify-between items-center mb-3">
-                <h4 class="font-semibold text-lg text-gray-800">
-                  Mama Cass Amala
-                </h4>
-                <span
-                  class="text-xs bg-green-500 text-white px-3 py-1 rounded-full font-medium"
-                >
-                  ✅ Verified
-                </span>
-              </div>
-              <p class="text-sm text-gray-600 mb-4">
-                Traditional Amala with gbegiri and ewedu
-              </p>
-              <div class="flex flex-col space-y-1 text-sm text-gray-500">
-                <span>📍 Ikorodu Rd, Lagos</span>
-                <span>⭐ 4.8 (127)</span>
-                <span>💰 ₦800–1200</span>
-              </div>
-            </div>
-
-            <!-- Spot Card -->
-            <div
-              class="border rounded-lg p-6 hover:shadow-lg transition-shadow"
-            >
-              <div class="flex justify-between items-center mb-3">
-                <h4 class="font-semibold text-lg text-gray-800">
-                  Amala Palace
-                </h4>
-                <span
-                  class="text-xs bg-gray-400 text-white px-3 py-1 rounded-full font-medium"
-                >
-                  ⚪ Pending
-                </span>
-              </div>
-              <p class="text-sm text-gray-600 mb-4">
-                Authentic Amala with fresh ingredients
-              </p>
-              <div class="flex flex-col space-y-1 text-sm text-gray-500">
-                <span>📍 Allen Ave, Ikeja</span>
-                <span>⭐ 4.5 (89)</span>
-                <span>💰 ₦1000–1500</span>
-              </div>
-            </div>
-
-            <!-- more spots ... -->
-          </div>
-
-          <div class="flex justify-center mt-10">
-            <button
-              class="px-8 py-3 bg-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-300 transition-colors"
-            >
-              View All My Spots (127)
-            </button>
-          </div>
-        </div>
-
-        <!-- REVIEW TAB -->
-        <div
-          id="profile-reviews"
-          class="profile-tab hidden bg-white rounded-2xl p-6 shadow border"
-        >
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-            📝 My Reviews
-          </h2>
-          <div class="space-y-4">
-            <div class="p-4 bg-gray-50 rounded">
-              <div class="font-semibold mb-1">Mama Cass Amala</div>
-              <div class="mb-2">⭐⭐⭐⭐⭐</div>
-              <p class="text-sm text-gray-600 mb-2">
-                Best Amala in Lagos! The gbegiri is perfectly seasoned and the
-                ewedu is fresh.
-              </p>
-              <div class="text-xs text-gray-400">2 days ago</div>
-            </div>
-            <div class="p-4 bg-gray-50 rounded">
-              <div class="font-semibold mb-1">Amala Palace</div>
-              <div class="mb-2">⭐⭐⭐⭐⭐</div>
-              <p class="text-sm text-gray-600 mb-2">
-                Premium experience with excellent service and authentic taste.
-              </p>
-              <div class="text-xs text-gray-400">1 week ago</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SETTINGS TAB-->
-        <div
-          id="profile-settings"
-          class="profile-tab hidden bg-white rounded-2xl p-8 shadow border border-gray-200"
-        >
-          <h2
-            class="text-xl font-bold mb-8 flex items-center gap-2 text-gray-800"
-          >
-            ⚙️ Settings
-          </h2>
-
-          <form class="space-y-8">
-            <!-- Name & Email -->
-            <div class="space-y-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Full Name</label
-                >
-                <input
-                  type="text"
-                  class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value="Adebayo Ogundimu"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Email</label
-                >
-                <input
-                  type="email"
-                  class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value="adebayo@email.com"
-                />
-              </div>
-            </div>
-
-            <!-- Location -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Location</label
+              <!-- MY ADDED SPOTS TAB -->
+              <div
+                id="profile-spots"
+                class="profile-tab hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
               >
-              <input
-                type="text"
-                class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
-                value="Lagos, Nigeria"
-              />
-            </div>
+                <h2
+                  class="text-2xl font-bold mb-8 flex items-center gap-2 text-gray-800"
+                >
+                  📍 My Added Spots
+                </h2>
+                <div class="relative">
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Spot Card -->
+                    <div
+                      class="border rounded-lg p-6 hover:shadow-lg transition-shadow"
+                    >
+                      <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-semibold text-lg text-gray-800">
+                          Mama Cass Amala
+                        </h4>
+                        <span
+                          class="text-xs bg-green-500 text-white px-3 py-1 rounded-full font-medium"
+                        >
+                          ✅ Verified
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-4">
+                        Traditional Amala with gbegiri and ewedu
+                      </p>
+                      <div
+                        class="flex flex-col space-y-1 text-sm text-gray-500"
+                      >
+                        <span>📍 Ikorodu Rd, Lagos</span>
+                        <span>⭐ 4.8 (127)</span>
+                        <span>💰 ₦800–1200</span>
+                      </div>
+                    </div>
 
-            <!-- Bio -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Bio</label
+                    <!-- Spot Card -->
+                    <div
+                      class="border rounded-lg p-6 hover:shadow-lg transition-shadow"
+                    >
+                      <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-semibold text-lg text-gray-800">
+                          Amala Palace
+                        </h4>
+                        <span
+                          class="text-xs bg-gray-400 text-white px-3 py-1 rounded-full font-medium"
+                        >
+                          ⚪ Pending
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-4">
+                        Authentic Amala with fresh ingredients
+                      </p>
+                      <div
+                        class="flex flex-col space-y-1 text-sm text-gray-500"
+                      >
+                        <span>📍 Allen Ave, Ikeja</span>
+                        <span>⭐ 4.5 (89)</span>
+                        <span>💰 ₦1000–1500</span>
+                      </div>
+                    </div>
+
+                    <!-- more spots ... -->
+                  </div>
+
+                  <div class="flex justify-center mt-10">
+                    <button
+                      class="px-8 py-3 bg-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-300 transition-colors"
+                    >
+                      View All My Spots (127)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- REVIEW TAB -->
+              <div
+                id="profile-reviews"
+                class="profile-tab hidden bg-white rounded-2xl p-6 shadow border"
               >
-              <textarea
-                rows="4"
-                class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                  📝 My Reviews
+                </h2>
+                <div class="space-y-4">
+                  <div class="p-4 bg-gray-50 rounded">
+                    <div class="font-semibold mb-1">Mama Cass Amala</div>
+                    <div class="mb-2">⭐⭐⭐⭐⭐</div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      Best Amala in Lagos! The gbegiri is perfectly seasoned and
+                      the ewedu is fresh.
+                    </p>
+                    <div class="text-xs text-gray-400">2 days ago</div>
+                  </div>
+                  <div class="p-4 bg-gray-50 rounded">
+                    <div class="font-semibold mb-1">Amala Palace</div>
+                    <div class="mb-2">⭐⭐⭐⭐⭐</div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      Premium experience with excellent service and authentic
+                      taste.
+                    </p>
+                    <div class="text-xs text-gray-400">1 week ago</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SETTINGS TAB-->
+              <div
+                id="profile-settings"
+                class="profile-tab hidden bg-white rounded-2xl p-8 shadow border border-gray-200"
               >
+                <h2
+                  class="text-xl font-bold mb-8 flex items-center gap-2 text-gray-800"
+                >
+                  ⚙️ Settings
+                </h2>
+
+                <form class="space-y-8">
+                  <!-- Name & Email -->
+                  <div class="space-y-6">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Full Name</label
+                      >
+                      <input
+                        type="text"
+                        class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                        value="Adebayo Ogundimu"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Email</label
+                      >
+                      <input
+                        type="email"
+                        class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                        value="adebayo@email.com"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Location -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                      >Location</label
+                    >
+                    <input
+                      type="text"
+                      class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                      value="Lagos, Nigeria"
+                    />
+                  </div>
+
+                  <!-- Bio -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                      >Bio</label
+                    >
+                    <textarea
+                      rows="4"
+                      class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                    >
 Passionate food explorer dedicated to discovering and sharing the best Amala spots across Lagos. Love connecting people with authentic Nigerian cuisine and supporting local businesses.</textarea
-              >
-            </div>
+                    >
+                  </div>
 
-            <!-- Email Notifications -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-3"
-                >Email Notifications</label
-              >
-              <div class="divide-y divide-gray-200">
-                <label
-                  class="flex items-center justify-between py-3 text-gray-700"
-                >
-                  <span>New spots near me</span>
-                  <input
-                    type="checkbox"
-                    class="rounded text-green-600"
-                    checked
-                  />
-                </label>
-                <label
-                  class="flex items-center justify-between py-3 text-gray-700"
-                >
-                  <span>Weekly digest</span>
-                  <input
-                    type="checkbox"
-                    class="rounded text-green-600"
-                    checked
-                  />
-                </label>
-                <label
-                  class="flex items-center justify-between py-3 text-gray-700"
-                >
-                  <span>Achievement notifications</span>
-                  <input type="checkbox" class="rounded text-green-600" />
-                </label>
+                  <!-- Email Notifications -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Email Notifications</label
+                    >
+                    <div class="divide-y divide-gray-200">
+                      <label
+                        class="flex items-center justify-between py-3 text-gray-700"
+                      >
+                        <span>New spots near me</span>
+                        <input
+                          type="checkbox"
+                          class="rounded text-green-600"
+                          checked
+                        />
+                      </label>
+                      <label
+                        class="flex items-center justify-between py-3 text-gray-700"
+                      >
+                        <span>Weekly digest</span>
+                        <input
+                          type="checkbox"
+                          class="rounded text-green-600"
+                          checked
+                        />
+                      </label>
+                      <label
+                        class="flex items-center justify-between py-3 text-gray-700"
+                      >
+                        <span>Achievement notifications</span>
+                        <input type="checkbox" class="rounded text-green-600" />
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Buttons -->
+                  <div class="flex flex-col sm:flex-row gap-6 pt-6">
+                    <button
+                      type="submit"
+                      class="w-full sm:w-1/2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-medium transition-colors"
+                    >
+                      💾 Save Changes
+                    </button>
+                    <a
+                      href="#profile-reviews"
+                      class="w-full sm:w-1/2 border border-gray-300 hover:bg-gray-100 text-gray-700 px-8 py-4 rounded-lg text-lg font-medium text-center transition-colors"
+                    >
+                      Cancel
+                    </a>
+                  </div>
+                </form>
               </div>
             </div>
-
-            <!-- Buttons -->
-            <div class="flex flex-col sm:flex-row gap-6 pt-6">
-              <button
-                type="submit"
-                class="w-full sm:w-1/2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-medium transition-colors"
-              >
-                💾 Save Changes
-              </button>
-              <a
-                href="#profile-reviews"
-                class="w-full sm:w-1/2 border border-gray-300 hover:bg-gray-100 text-gray-700 px-8 py-4 rounded-lg text-lg font-medium text-center transition-colors"
-              >
-                Cancel
-              </a>
-            </div>
-          </form>
+          </div>
         </div>
       </section>
 
@@ -1632,30 +1770,66 @@ Passionate food explorer dedicated to discovering and sharing the best Amala spo
       </div>
     </div>
     <script>
-      /*Navigation
-      function showSection(sectionId) {
-        // Hide all sections
-        document.querySelectorAll(".page-section").forEach((section) => {
-          section.style.display = "none"; // directly hide via inline style
-        });
+      // Section navigation
+      function animatePopup(popupId) {
+        const popup = document.getElementById(popupId);
 
-        // Show the target section
-        const targetSection = document.getElementById(sectionId);
-        if (targetSection) {
-          targetSection.style.display = "block"; // force display
+        if (popup.classList.contains("hidden")) {
+          popup.classList.remove("hidden");
+          requestAnimationFrame(() => {
+            popup.classList.remove("translate-x-4", "opacity-0");
+            popup.classList.add("translate-x-0", "opacity-100");
+          });
+        } else {
+          popup.classList.remove("translate-x-0", "opacity-100");
+          popup.classList.add("translate-x-4", "opacity-0");
+          setTimeout(() => {
+            popup.classList.add("hidden");
+          }, 300);
+        }
+      }
+
+      function toggleAddSpotTips() {
+        animatePopup("add-spot-tips-popup");
+        const verificationPopup = document.getElementById(
+          "verification-tips-popup"
+        );
+        verificationPopup.classList.remove("translate-x-0", "opacity-100");
+        verificationPopup.classList.add("translate-x-4", "opacity-0");
+        setTimeout(() => verificationPopup.classList.add("hidden"), 300);
+      }
+
+      function toggleVerificationTips() {
+        animatePopup("verification-tips-popup");
+        const addSpotPopup = document.getElementById("add-spot-tips-popup");
+        addSpotPopup.classList.remove("translate-x-0", "opacity-100");
+        addSpotPopup.classList.add("translate-x-4", "opacity-0");
+        setTimeout(() => addSpotPopup.classList.add("hidden"), 300);
+      }
+
+      document.addEventListener("click", (e) => {
+        // Close Add Spot Tips
+        if (
+          !e.target.closest(".add-spot-tips-toggle") &&
+          !e.target.closest("#add-spot-tips-popup")
+        ) {
+          const popup = document.getElementById("add-spot-tips-popup");
+          popup.classList.remove("translate-x-0", "opacity-100");
+          popup.classList.add("translate-x-4", "opacity-0");
+          setTimeout(() => popup.classList.add("hidden"), 300);
         }
 
-        // Close mobile menu if open
-        const mobileMenu = document.getElementById("mobileMenu");
-        if (mobileMenu) {
-          mobileMenu.classList.remove(
-            "opacity-100",
-            "visible",
-            "translate-y-0"
-          );
-          mobileMenu.classList.add("opacity-0", "invisible", "-translate-y-2");
+        // Close Verification Tips
+        if (
+          !e.target.closest(".verification-tips-toggle") &&
+          !e.target.closest("#verification-tips-popup")
+        ) {
+          const popup = document.getElementById("verification-tips-popup");
+          popup.classList.remove("translate-x-0", "opacity-100");
+          popup.classList.add("translate-x-4", "opacity-0");
+          setTimeout(() => popup.classList.add("hidden"), 300);
         }
-      }*/
+      });
 
       // Handle chat input 'Enter' key
       // Chat functionality
